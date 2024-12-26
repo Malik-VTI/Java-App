@@ -36,7 +36,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
         try {
             Product product = productService.getProductById(productId);
-            return ResponseEntity.ok(new ApiResponse("Product: ", product));
+            ProductDto productDto = productService.getProductDto(product);
+            return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
@@ -46,7 +47,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest request){
         try {
             Product newProduct = productService.addProduct(request);
-            return ResponseEntity.ok(new ApiResponse("Successfull add products", newProduct));
+            ProductDto productDto = productService.getProductDto(newProduct);
+            return ResponseEntity.ok(new ApiResponse("Successfull add products", productDto));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
@@ -56,7 +58,8 @@ public class ProductController {
     public ResponseEntity<ApiResponse> updateProduct(@RequestBody AddProductRequest request, @PathVariable Long productId){
         try {
             Product product = productService.getProductById(productId);
-            return ResponseEntity.ok(new ApiResponse("Product updated", product));
+            ProductDto productDto = productService.getProductDto(product);
+            return ResponseEntity.ok(new ApiResponse("Product updated", productDto));
         } catch (ResourceException e){
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Update failed", null));
         }
