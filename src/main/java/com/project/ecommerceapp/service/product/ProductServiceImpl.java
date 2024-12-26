@@ -3,7 +3,6 @@ import com.project.ecommerceapp.dto.ProductDto;
 import com.project.ecommerceapp.exceptions.ResourceException;
 import com.project.ecommerceapp.mapper.ProductMapper;
 import com.project.ecommerceapp.model.Category;
-import com.project.ecommerceapp.model.Image;
 import com.project.ecommerceapp.model.Product;
 import com.project.ecommerceapp.repository.CategoryRepository;
 import com.project.ecommerceapp.repository.ProductRepository;
@@ -182,7 +181,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductDto> getListProductDto(List<Product> products) {
-        return ProductMapper.INSTANCE.productlistToProductDto(products);
+        return ProductMapper.INSTANCE.productListToProductDto(products);
     }
 
 }

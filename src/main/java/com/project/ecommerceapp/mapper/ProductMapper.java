@@ -1,6 +1,7 @@
 package com.project.ecommerceapp.mapper;
 
 import com.project.ecommerceapp.dto.ProductDto;
+import com.project.ecommerceapp.model.Category;
 import com.project.ecommerceapp.model.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,5 +17,9 @@ public interface ProductMapper {
     @Mapping(source = "category.name", target = "category")
     ProductDto producToProductDto(Product product);
 
-    List<ProductDto> productlistToProductDto(List<Product> products);
+    List<ProductDto> productListToProductDto(List<Product> products);
+
+    default String map(Category category) {
+        return category != null ? category.getName() : null;
+    }
 }
