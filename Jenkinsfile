@@ -32,7 +32,7 @@ pipeline {
             steps {
                 // Restart aplikasi menggunakan systemctl
                 sh '''
-                    sudo systemctl restart sample-application.service
+                    echo "M@B#26L2KUns" | sudo -S systemctl restart sample-application.service
                 '''
             }
         }
