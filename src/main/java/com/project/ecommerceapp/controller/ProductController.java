@@ -9,7 +9,8 @@ import com.project.ecommerceapp.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,11 +22,13 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("${api.prefix}/product")
 public class ProductController {
     private final ProductService productService;
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse> getProducts(){
         List<Product>products = productService.getAllProduct();
         List<ProductDto> dataProduct = productService.getListProductDto(products);
+        logger.info("Endpoint get all product");
         if (products.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
@@ -34,6 +37,7 @@ public class ProductController {
 
     @GetMapping("/id/{productId}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
+        logger.info("Endpoint get product by id");
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
@@ -45,6 +49,7 @@ public class ProductController {
 
     @PostMapping("/")
     public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest request){
+        logger.info("Endpoint for add new product");
         try {
             Product newProduct = productService.addProduct(request);
             ProductDto productDto = productService.getProductDto(newProduct);
@@ -54,8 +59,9 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/{productId}/update")
+    @PatchMapping("/{productId}/update")
     public ResponseEntity<ApiResponse> updateProduct(@RequestBody AddProductRequest request, @PathVariable Long productId){
+        logger.info("Endpoint for update product by id");
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
@@ -67,6 +73,7 @@ public class ProductController {
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long productId){
+        logger.info("Delete product by id");
         try {
             productService.deleteProductById(productId);
             return ResponseEntity.ok(new ApiResponse("Message: ", "Product deleted"));
@@ -77,6 +84,7 @@ public class ProductController {
 
     @GetMapping("/brand-and-name")
     public ResponseEntity<ApiResponse> getProductsByBrandAndName(@RequestParam String brandName, @RequestParam String productName){
+        logger.info("Get product by brand name and product name");
         try {
             List<Product> products = productService.getProductsByBrandAndName(brandName, productName);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
@@ -91,6 +99,7 @@ public class ProductController {
 
     @GetMapping("/category-and-brand")
     public ResponseEntity<ApiResponse> getProductsByCategoryAndBrand(@RequestParam String category, @RequestParam String brandName){
+        logger.info("Get product by category dan brand name");
         try {
             List<Product> products = productService.getProductsByCategoryAndBrand(category, brandName);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
@@ -103,8 +112,9 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<ApiResponse> getProductsByName(@PathVariable String name){
+    @GetMapping("/name")
+    public ResponseEntity<ApiResponse> getProductsByName(@RequestParam String name){
+        logger.info("Get product by name");
         try {
             List<Product> products = productService.getProductsByName(name);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
@@ -119,6 +129,7 @@ public class ProductController {
 
     @GetMapping("/brand")
     public ResponseEntity<ApiResponse> getProductsByBrand(@RequestParam String brand){
+        logger.info("Get product by brand");
         try {
             List<Product> products = productService.getProductsByBrand(brand);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
@@ -131,8 +142,9 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{category}")
-    public ResponseEntity<ApiResponse> getProductsByCategory(@PathVariable String category){
+    @GetMapping("/category")
+    public ResponseEntity<ApiResponse> getProductsByCategory(@RequestParam String category){
+        logger.info("Get product by category");
         try {
             List<Product> products = productService.getProductsByCategory(category);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
