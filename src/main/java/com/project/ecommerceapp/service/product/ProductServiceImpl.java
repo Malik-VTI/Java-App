@@ -1,4 +1,5 @@
 package com.project.ecommerceapp.service.product;
+import com.project.ecommerceapp.controller.ProductController;
 import com.project.ecommerceapp.dto.ProductDto;
 import com.project.ecommerceapp.exceptions.ResourceException;
 import com.project.ecommerceapp.mapper.ProductMapper;
@@ -8,7 +9,10 @@ import com.project.ecommerceapp.repository.CategoryRepository;
 import com.project.ecommerceapp.repository.ProductRepository;
 import com.project.ecommerceapp.request.AddProductRequest;
 import com.project.ecommerceapp.request.UpdateProductRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +27,7 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     /*
         - Added new product
@@ -40,6 +45,7 @@ public class ProductServiceImpl implements ProductService{
                     return categoryRepository.save(newCategory);
                 });
         request.setCategory(category);
+        logger.info("Set new product");
         return productRepository.save(createProduct(request, category));
     }
     private Product createProduct (AddProductRequest request, Category category){
@@ -60,6 +66,7 @@ public class ProductServiceImpl implements ProductService{
     */
     @Override
     public Product getProductById(Long id) {
+        logger.info("Find product by id: " + id);
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceException("Product Not Found"));
     }
@@ -71,6 +78,7 @@ public class ProductServiceImpl implements ProductService{
     */
     @Override
     public void deleteProductById(Long id) {
+        logger.info("Delete product by id: " + id);
         productRepository.findById(id)
                 .ifPresentOrElse(productRepository::delete, () -> {
                     throw new ResourceException("Product Not Found");
@@ -83,6 +91,7 @@ public class ProductServiceImpl implements ProductService{
         - productId : Param from product id selected for update.
         - Throw exception message if product with id selected not found.
     */
+    @Transactional
     @Override
     public Product updateProduct(UpdateProductRequest request, Long productId) {
         return productRepository.findById(productId)
@@ -91,6 +100,8 @@ public class ProductServiceImpl implements ProductService{
                 .orElseThrow(() -> new ResourceException("Product Not Found"));
     }
     private Product updateExistingProduct(Product product, UpdateProductRequest request){
+        logger.info("Update product: " + product.getId());
+        logger.info("New name: " + request.getName());
         product.setName(request.getName());
         product.setBrand(request.getBrand());
         product.setPrice(request.getPrice());
