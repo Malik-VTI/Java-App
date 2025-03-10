@@ -10,7 +10,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Build aplikasi (contoh menggunakan Maven)
-                sh 'mvn clean install'
+                sh '/usr/bin/mvn clean install'
             }
         }
         stage('Test') {
@@ -32,7 +32,7 @@ pipeline {
             steps {
                 // Restart aplikasi menggunakan systemctl
                 sh '''
-                    echo "M@B#26L2KUns" | sudo -S systemctl restart sample-application.service
+                    echo "P@ssw0rd" | sudo -S systemctl restart sample-application.service
                 '''
             }
         }
