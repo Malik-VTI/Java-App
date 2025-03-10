@@ -4,7 +4,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Ambil kode dari GitHub
-                git branch: 'main', url: 'git@github.com:Malik-VTI/Java-App.git'
+                git branch: 'main', url: 'https://github.com/Malik-VTI/Java-App.git'
             }
         }
         stage('Build') {
