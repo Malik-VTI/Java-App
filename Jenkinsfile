@@ -23,8 +23,8 @@ pipeline {
             steps {
                 // Pindahkan hasil build ke direktori aplikasi
                 sh '''
-                    sudo mkdir -p /opt/sample-application
-                    sudo cp target/ecommerce-app-0.0.1-SNAPSHOT.jar /opt/sample-application/
+                    sudo mkdir -p /opt/product-management
+                    sudo cp target/ecommerce-app-0.0.1-SNAPSHOT.jar /opt/product-management/
                 '''
             }
         }
@@ -32,7 +32,7 @@ pipeline {
             steps {
                 // Restart aplikasi menggunakan systemctl
                 sh '''
-                    echo "M@B#26L2KUns" | sudo -S systemctl restart sample-application.service
+                    echo "P@ssw0rd" | sudo -S systemctl restart product-management.service
                 '''
             }
         }
