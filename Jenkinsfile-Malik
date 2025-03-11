@@ -4,13 +4,13 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Ambil kode dari GitHub
-                git branch: 'main', url: 'git@github.com:Malik-VTI/Java-App.git'
+                git branch: 'main', url: 'https://github.com/Malik-VTI/Java-App.git'
             }
         }
         stage('Build') {
             steps {
                 // Build aplikasi (contoh menggunakan Maven)
-                sh 'mvn clean install'
+                sh '/usr/bin/mvn clean install'
             }
         }
         stage('Test') {
@@ -23,8 +23,8 @@ pipeline {
             steps {
                 // Pindahkan hasil build ke direktori aplikasi
                 sh '''
-                    sudo mkdir -p /opt/sample-application
-                    sudo cp target/ecommerce-app-0.0.1-SNAPSHOT.jar /opt/sample-application/
+                    mkdir -p /opt/sample-application
+                    cp target/ecommerce-app-0.0.1-SNAPSHOT.jar /opt/sample-application/
                 '''
             }
         }
@@ -32,7 +32,7 @@ pipeline {
             steps {
                 // Restart aplikasi menggunakan systemctl
                 sh '''
-                    echo "M@B#26L2KUns" | sudo -S systemctl restart sample-application.service
+                    echo "P@ssw0rd" | sudo -S systemctl restart sample-application.service
                 '''
             }
         }
