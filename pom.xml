@@ -102,11 +102,11 @@
 			<artifactId>logstash-logback-encoder</artifactId>
 			<version>8.0</version> <!-- Gunakan versi terbaru -->
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>ch.qos.logback</groupId>-->
-<!--			<artifactId>logback-classic</artifactId>-->
-<!--			<version>1.5.16</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.5.16</version>
+		</dependency>
 		<dependency>
 			<groupId>com.datadoghq</groupId>
 			<artifactId>dd-trace-api</artifactId>
