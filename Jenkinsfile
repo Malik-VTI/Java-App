@@ -28,7 +28,7 @@ pipeline {
             steps {
                 echo "Preparing deployment directory..."
                 sh """
-                    if [ ! -d "${APP_DIR}" ]; then
+                    if [ ! -d \${APP_DIR} ]; then
                         sudo mkdir -p \${APP_DIR}
                         sudo chown $(whoami):$(whoami) \${APP_DIR}
                     fi
