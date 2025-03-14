@@ -1,39 +1,58 @@
 pipeline {
     agent any
+    environment {
+        APP_NAME = "ecommerce-app-0.0.1-SNAPSHOT.jar"
+        APP_DIR = "/opt/product-management"
+        SERVICE_NAME = "product-management.service"
+    }
     stages {
         stage('Checkout') {
             steps {
-                // Ambil kode dari GitHub
+                echo "Cloning repository..."
                 git branch: 'main', url: 'https://github.com/Malik-VTI/Java-App.git'
             }
         }
         stage('Build') {
             steps {
-                // Build aplikasi (contoh menggunakan Maven)
+                echo "Building application..."
                 sh 'mvn clean install'
             }
         }
         stage('Test') {
             steps {
-                // Jalankan unit test
+                echo "Running unit tests..."
                 sh 'mvn test'
             }
         }
         stage('Package') {
             steps {
-                // Pindahkan hasil build ke direktori aplikasi
-                sh '''
-                    sudo mkdir -p /opt/product-management
-                    sudo cp target/ecommerce-app-0.0.1-SNAPSHOT.jar /opt/product-management/
-                '''
+                echo "Preparing deployment directory..."
+                sh """
+                    if [ ! -d "${APP_DIR}" ]; then
+                        sudo mkdir -p ${APP_DIR}
+                        sudo chown $(whoami):$(whoami) ${APP_DIR}
+                    fi
+                """
+                echo "Copying artifact to deployment directory..."
+                sh """
+                    sudo rm -f ${APP_DIR}/${APP_NAME}
+                    sudo cp target/${APP_NAME} ${APP_DIR}/
+                    sudo chmod 755 ${APP_DIR}/${APP_NAME}
+                """
             }
         }
         stage('Restart Application') {
             steps {
-                // Restart aplikasi menggunakan systemctl
-                sh '''
-                    echo "P@ssw0rd" | sudo -S systemctl restart product-management.service
-                '''
+                echo "Restarting application service..."
+                sh """
+                    if systemctl list-units --full -all | grep -q ${SERVICE_NAME}; then
+                        echo "P@ssw0rd" | sudo -S systemctl restart ${SERVICE_NAME}
+                        echo "Service restarted successfully!"
+                    else
+                        echo "Service ${SERVICE_NAME} not found. Please check your systemd configuration."
+                        exit 1
+                    fi
+                """
             }
         }
     }
