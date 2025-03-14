@@ -33,14 +33,7 @@ public class ProductController {
         if (products.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
-        try {
-            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-            logger.info("Getting all products");
-        } finally {
-            ThreadContext.remove("dd.trace_id");
-            ThreadContext.remove("dd.span_id");
-        }
+        logger.info("Getting all products");
         return ResponseEntity.ok(new ApiResponse("Product:", dataProduct));
     }
 
@@ -49,24 +42,10 @@ public class ProductController {
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
-            try {
-                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-                logger.info("Getting product by id");
-            } finally {
-                ThreadContext.remove("dd.trace_id");
-                ThreadContext.remove("dd.span_id");
-            }
+            logger.info("Getting product by id");
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
-            try {
-                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-                logger.info("Product not found with this id");
-            } finally {
-                ThreadContext.remove("dd.trace_id");
-                ThreadContext.remove("dd.span_id");
-            }
+            logger.info("Product not found with id: " + productId);
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }
@@ -77,8 +56,10 @@ public class ProductController {
         try {
             Product newProduct = productService.addProduct(request);
             ProductDto productDto = productService.getProductDto(newProduct);
+            logger.info("Add new product", request);
             return ResponseEntity.ok(new ApiResponse("Successfull add products", productDto));
         } catch (Exception e) {
+            logger.info("Can't create new product");
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
@@ -89,6 +70,7 @@ public class ProductController {
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
+            logger.info("Update product by id");
             return ResponseEntity.ok(new ApiResponse("Product updated", productDto));
         } catch (ResourceException e){
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Update failed", null));
@@ -100,6 +82,7 @@ public class ProductController {
         logger.info("Delete product by id");
         try {
             productService.deleteProductById(productId);
+            logger.info("Product with id: " + productId + " deleted");
             return ResponseEntity.ok(new ApiResponse("Message: ", "Product deleted"));
         } catch (ResourceException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
