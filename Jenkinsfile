@@ -29,15 +29,15 @@ pipeline {
                 echo "Preparing deployment directory..."
                 sh """
                     if [ ! -d "${APP_DIR}" ]; then
-                        sudo mkdir -p ${APP_DIR}
-                        sudo chown $(whoami):$(whoami) ${APP_DIR}
+                        sudo mkdir -p "${APP_DIR}"
+                        sudo chown $(whoami):$(whoami) "${APP_DIR}"
                     fi
                 """
                 echo "Copying artifact to deployment directory..."
                 sh """
-                    sudo rm -f ${APP_DIR}/${APP_NAME}
-                    sudo cp target/${APP_NAME} ${APP_DIR}/
-                    sudo chmod 755 ${APP_DIR}/${APP_NAME}
+                    sudo rm -f "${APP_DIR}/${APP_NAME}"
+                    sudo cp "target/${APP_NAME}" "${APP_DIR}/"
+                    sudo chmod 755 "${APP_DIR}/${APP_NAME}"
                 """
             }
         }
