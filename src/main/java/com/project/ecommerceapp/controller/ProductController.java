@@ -7,12 +7,14 @@ import com.project.ecommerceapp.request.AddProductRequest;
 import com.project.ecommerceapp.response.ApiResponse;
 import com.project.ecommerceapp.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
+import datadog.trace.api.CorrelationIdentifier;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -28,21 +30,43 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProducts(){
         List<Product>products = productService.getAllProduct();
         List<ProductDto> dataProduct = productService.getListProductDto(products);
-        logger.info("Endpoint get all product");
         if (products.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
+        }
+        try {
+            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+            logger.info("Getting all products");
+        } finally {
+            ThreadContext.remove("dd.trace_id");
+            ThreadContext.remove("dd.span_id");
         }
         return ResponseEntity.ok(new ApiResponse("Product:", dataProduct));
     }
 
     @GetMapping("/id/{productId}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
-        logger.info("Endpoint get product by id");
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
+            try {
+                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+                logger.info("Getting product by id");
+            } finally {
+                ThreadContext.remove("dd.trace_id");
+                ThreadContext.remove("dd.span_id");
+            }
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
+            try {
+                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+                logger.info("Product not found with this id");
+            } finally {
+                ThreadContext.remove("dd.trace_id");
+                ThreadContext.remove("dd.span_id");
+            }
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }

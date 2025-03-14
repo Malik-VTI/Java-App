@@ -102,6 +102,11 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.4.11</version>
 		</dependency>
+		<dependency>
+			<groupId>com.datadoghq</groupId>
+			<artifactId>dd-trace-api</artifactId>
+			<version>1.40.2</version>
+		</dependency>
 
 	</dependencies>
 
