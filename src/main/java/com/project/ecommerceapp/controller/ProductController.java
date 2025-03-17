@@ -8,6 +8,7 @@ import com.project.ecommerceapp.response.ApiResponse;
 import com.project.ecommerceapp.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.ThreadContext;
+import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
@@ -33,7 +34,15 @@ public class ProductController {
         if (products.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
-        logger.info("Getting all products");
+        try {
+            MDC.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+            MDC.put("dd.span_id", CorrelationIdentifier.getSpanId());
+
+            logger.info("Getting all products");
+        } finally {
+            MDC.remove("dd.trace_id");
+            MDC.remove("dd.span_id");
+        }
         return ResponseEntity.ok(new ApiResponse("Product:", dataProduct));
     }
 
@@ -42,10 +51,28 @@ public class ProductController {
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
-            logger.info("Getting product by id");
+            try {
+                MDC.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+                MDC.put("dd.span_id", CorrelationIdentifier.getSpanId());
+
+                logger.info("Getting product by id");
+
+            } finally {
+                MDC.remove("dd.trace_id");
+                MDC.remove("dd.span_id");
+            }
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
-            logger.info("Product not found with id: " + productId);
+            try {
+                MDC.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+                MDC.put("dd.span_id", CorrelationIdentifier.getSpanId());
+
+                logger.info("Product not found with id: " + productId);
+
+            } finally {
+                MDC.remove("dd.trace_id");
+                MDC.remove("dd.span_id");
+            }
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }
