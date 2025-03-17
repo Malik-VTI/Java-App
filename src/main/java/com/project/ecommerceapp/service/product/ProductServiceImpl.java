@@ -91,12 +91,20 @@ public class ProductServiceImpl implements ProductService{
         - productId : Param from product id selected for update.
         - Throw exception message if product with id selected not found.
     */
-    @Transactional
     @Override
     public Product updateProduct(UpdateProductRequest request, Long productId) {
+        logger.info("Finding product with id: " + productId);
         return productRepository.findById(productId)
-                .map(product -> updateExistingProduct(product, request))
-                .map(productRepository::save)
+                .map(product -> {
+                    logger.info("Product found: " + product.getId());
+                    return updateExistingProduct(product, request);
+                })
+                .map(updatedProduct -> {
+                    Product savedProduct = productRepository.save(updatedProduct);
+                    productRepository.flush();
+                    logger.info("Update product succesfully, id: " + savedProduct.getId());
+                    return savedProduct;
+                })
                 .orElseThrow(() -> new ResourceException("Product Not Found"));
     }
     private Product updateExistingProduct(Product product, UpdateProductRequest request){
@@ -108,7 +116,11 @@ public class ProductServiceImpl implements ProductService{
         product.setInventory(request.getInventory());
         product.setDescription(request.getDescription());
 
+        logger.info("Finding category: " + request.getCategory().getName());
         Category category = categoryRepository.findByName(request.getCategory().getName());
+        if (category == null) {
+            throw new ResourceException("Category not found");
+        }
         product.setCategory(category);
         return product;
     }
