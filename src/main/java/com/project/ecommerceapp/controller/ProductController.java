@@ -7,15 +7,12 @@ import com.project.ecommerceapp.request.AddProductRequest;
 import com.project.ecommerceapp.response.ApiResponse;
 import com.project.ecommerceapp.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.ThreadContext;
-import org.slf4j.MDC;
+import org.apache.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
-import datadog.trace.api.CorrelationIdentifier;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -25,7 +22,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("${api.prefix}/product")
 public class ProductController {
     private final ProductService productService;
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private static final Logger logger = Logger.getLogger(ProductController.class);
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse> getProducts(){
@@ -57,7 +54,7 @@ public class ProductController {
         try {
             Product newProduct = productService.addProduct(request);
             ProductDto productDto = productService.getProductDto(newProduct);
-            logger.info("Add new product", request);
+            logger.info("Add new product");
             return ResponseEntity.ok(new ApiResponse("Successfull add products", productDto));
         } catch (Exception e) {
             logger.info("Can't create new product");

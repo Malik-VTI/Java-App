@@ -11,7 +11,7 @@ import com.project.ecommerceapp.request.AddProductRequest;
 import com.project.ecommerceapp.request.UpdateProductRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
+import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(ProductServiceImpl.class);
 
     /*
         - Added new product
