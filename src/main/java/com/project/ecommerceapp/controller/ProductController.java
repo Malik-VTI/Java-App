@@ -34,15 +34,7 @@ public class ProductController {
         if (products.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
-        try {
-            MDC.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-            MDC.put("dd.span_id", CorrelationIdentifier.getSpanId());
-
-            logger.info("Getting all products");
-        } finally {
-            MDC.remove("dd.trace_id");
-            MDC.remove("dd.span_id");
-        }
+        logger.info("Getting all products");
         return ResponseEntity.ok(new ApiResponse("Product:", dataProduct));
     }
 
@@ -51,28 +43,10 @@ public class ProductController {
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
-            try {
-                MDC.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-                MDC.put("dd.span_id", CorrelationIdentifier.getSpanId());
-
-                logger.info("Getting product by id");
-
-            } finally {
-                MDC.remove("dd.trace_id");
-                MDC.remove("dd.span_id");
-            }
+            logger.info("Getting product by id");
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
-            try {
-                MDC.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-                MDC.put("dd.span_id", CorrelationIdentifier.getSpanId());
-
-                logger.info("Product not found with id: " + productId);
-
-            } finally {
-                MDC.remove("dd.trace_id");
-                MDC.remove("dd.span_id");
-            }
+            logger.info("Product not found with id: " + productId);
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }
