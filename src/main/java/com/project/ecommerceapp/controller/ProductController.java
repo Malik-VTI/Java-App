@@ -6,8 +6,10 @@ import com.project.ecommerceapp.model.Product;
 import com.project.ecommerceapp.request.AddProductRequest;
 import com.project.ecommerceapp.response.ApiResponse;
 import com.project.ecommerceapp.service.product.ProductService;
+import datadog.trace.api.CorrelationIdentifier;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.LoggerFactory;
@@ -26,26 +28,61 @@ public class ProductController {
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse> getProducts(){
-        logger.info("Fetching all products");
+        try {
+            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+            logger.info("Fetching all products");
+        } finally {
+            ThreadContext.remove("dd.trace_id");
+            ThreadContext.remove("dd.span_id");
+        }
         List<Product>products = productService.getAllProduct();
         List<ProductDto> dataProduct = productService.getListProductDto(products);
         if (products.isEmpty()) {
-            logger.info("No products available");
+            try {
+                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+                logger.info("No products available");
+            } finally {
+                ThreadContext.remove("dd.trace_id");
+                ThreadContext.remove("dd.span_id");
+            }
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
-        logger.info("Getting all products");
+        try {
+            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+            logger.info("Getting all products");
+        } finally {
+            ThreadContext.remove("dd.trace_id");
+            ThreadContext.remove("dd.span_id");
+        }
         return ResponseEntity.ok(new ApiResponse("Product:", dataProduct));
     }
 
     @GetMapping("/id/{productId}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
-        logger.info("Fetching product by id: " + productId);
+        try {
+            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+            logger.info("Fetching product by id: " + productId);
+        } finally {
+            ThreadContext.remove("dd.trace_id");
+            ThreadContext.remove("dd.span_id");
+        }
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
-            logger.error("Product not found with id: " + productId, e);
+            try {
+                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
+                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
+                logger.error("Product not found with id: " + productId, e);
+            } finally {
+                ThreadContext.remove("dd.trace_id");
+                ThreadContext.remove("dd.span_id");
+            }
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }
