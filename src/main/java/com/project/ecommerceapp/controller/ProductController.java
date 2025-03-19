@@ -26,9 +26,11 @@ public class ProductController {
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse> getProducts(){
+        logger.info("Fetching all products");
         List<Product>products = productService.getAllProduct();
         List<ProductDto> dataProduct = productService.getListProductDto(products);
         if (products.isEmpty()) {
+            logger.info("No products available");
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
         logger.info("Getting all products");
@@ -37,67 +39,68 @@ public class ProductController {
 
     @GetMapping("/id/{productId}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
+        logger.info("Fetching product by id: " + productId);
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
-            logger.info("Getting product by id");
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
-            logger.info("Product not found with id: " + productId);
+            logger.error("Product not found with id: " + productId, e);
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }
 
     @PostMapping("/")
     public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest request){
-        logger.info("Endpoint for add new product");
+        logger.info("Adding new product");
         try {
             Product newProduct = productService.addProduct(request);
             ProductDto productDto = productService.getProductDto(newProduct);
-            logger.info("Add new product");
             return ResponseEntity.ok(new ApiResponse("Successfull add products", productDto));
         } catch (Exception e) {
-            logger.info("Can't create new product");
+            logger.error("Failed to add new product", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     @PutMapping("/id/{productId}/update")
     public ResponseEntity<ApiResponse> updateProduct(@RequestBody AddProductRequest request, @PathVariable Long productId){
-        logger.info("Endpoint for update product by id");
+        logger.info("Updating product by id: " + productId);
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
-            logger.info("Update product by id");
             return ResponseEntity.ok(new ApiResponse("Product updated", productDto));
         } catch (ResourceException e){
+            logger.error("Failed to update product with id: " + productId, e);
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Update failed", null));
         }
     }
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long productId){
-        logger.info("Delete product by id");
+        logger.info("Delete product by id: " + productId);
         try {
             productService.deleteProductById(productId);
-            logger.info("Product with id: " + productId + " deleted");
             return ResponseEntity.ok(new ApiResponse("Message: ", "Product deleted"));
         } catch (ResourceException e) {
+            logger.error("Failed to delete product with id: " + productId, e);
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     @GetMapping("/brand-and-name")
     public ResponseEntity<ApiResponse> getProductsByBrandAndName(@RequestParam String brandName, @RequestParam String productName){
-        logger.info("Get product by brand name and product name");
+        logger.info("Fetching products by brand: " + brandName + " and name: " + productName);
         try {
             List<Product> products = productService.getProductsByBrandAndName(brandName, productName);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
             if (products.isEmpty()) {
+                logger.info("No products found for brand: " + brandName + " and name: " + productName);
                 return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Product not found", null));
             }
             return ResponseEntity.ok(new ApiResponse("Data:", dataProduct));
         } catch (Exception e){
+            logger.error("Failed to fetch products by brand and name", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }

@@ -39,13 +39,15 @@ public class ProductServiceImpl implements ProductService{
         // check the category in the database
         // set the product if found the category
         // set new category, if we can't found category
+        logger.info("Adding new product");
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
+                    logger.info("Category not found, creating new category");
                     Category newCategory = new Category(request.getCategory().getName());
                     return categoryRepository.save(newCategory);
                 });
         request.setCategory(category);
-        logger.info("Set new product");
+        logger.info("Product added successfully");
         return productRepository.save(createProduct(request, category));
     }
     private Product createProduct (AddProductRequest request, Category category){
@@ -66,9 +68,12 @@ public class ProductServiceImpl implements ProductService{
     */
     @Override
     public Product getProductById(Long id) {
-        logger.info("Find product by id: " + id);
+        logger.info("Fetching product by id: " + id);
         return productRepository.findById(id)
-                .orElseThrow(() -> new ResourceException("Product Not Found"));
+                .orElseThrow(() -> {
+                    logger.error("Product not found with id: " + id);
+                    throw new ResourceException("Product Not Found");
+                });
     }
 
     /*
@@ -80,7 +85,11 @@ public class ProductServiceImpl implements ProductService{
     public void deleteProductById(Long id) {
         logger.info("Delete product by id: " + id);
         productRepository.findById(id)
-                .ifPresentOrElse(productRepository::delete, () -> {
+                .ifPresentOrElse(product -> {
+                    productRepository.delete(product);
+                    logger.info("Product deleted successfully with id: " + id);
+                }, () -> {
+                    logger.error("Product not found with id: " + id);
                     throw new ResourceException("Product Not Found");
                 });
     }
@@ -93,32 +102,35 @@ public class ProductServiceImpl implements ProductService{
     */
     @Override
     public Product updateProduct(UpdateProductRequest request, Long productId) {
-        logger.info("Finding product with id: " + productId);
+        logger.info("Update product with id: " + productId);
         return productRepository.findById(productId)
                 .map(product -> {
-                    logger.info("Product found: " + product.getId());
+                    logger.info("Product found with id: " + productId);
                     return updateExistingProduct(product, request);
                 })
                 .map(updatedProduct -> {
                     Product savedProduct = productRepository.save(updatedProduct);
                     productRepository.flush();
-                    logger.info("Update product succesfully, id: " + savedProduct.getId());
+                    logger.info("Product updated successfully with id: " + savedProduct.getId());
                     return savedProduct;
                 })
-                .orElseThrow(() -> new ResourceException("Product Not Found"));
+                .orElseThrow(() -> {
+                    logger.error("Product not found with id: " + productId);
+                    return new ResourceException("Product Not Found");
+                });
     }
     private Product updateExistingProduct(Product product, UpdateProductRequest request){
-        logger.info("Update product: " + product.getId());
-        logger.info("New name: " + request.getName());
+        logger.info("Updating product details for id: " + product.getId());
         product.setName(request.getName());
         product.setBrand(request.getBrand());
         product.setPrice(request.getPrice());
         product.setInventory(request.getInventory());
         product.setDescription(request.getDescription());
 
-        logger.info("Finding category: " + request.getCategory().getName());
+        logger.info("Fetching category: " + request.getCategory().getName());
         Category category = categoryRepository.findByName(request.getCategory().getName());
         if (category == null) {
+            logger.error("Category not found: " + request.getCategory().getName());
             throw new ResourceException("Category not found");
         }
         product.setCategory(category);
@@ -131,6 +143,7 @@ public class ProductServiceImpl implements ProductService{
     */
     @Override
     public List<Product> getAllProduct() {
+        logger.info("Fetching all products");
         return productRepository.findAll();
     }
 
@@ -141,6 +154,7 @@ public class ProductServiceImpl implements ProductService{
     */
     @Override
     public List<Product> getProductsByCategory(String category) {
+        logger.info("Fetching products by category: " + category);
         return productRepository.findByCategoryName(category);
     }
 
