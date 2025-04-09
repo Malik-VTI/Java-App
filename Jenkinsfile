@@ -43,10 +43,10 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh '''
-                        kubectl apply -f k8s/configmap.yaml
-                        kubectl apply -f k8s/secret.yaml
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl apply -f k8s/service.yaml
+                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/configmap.yaml
+                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/secret.yaml
+                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/deployment.yaml
+                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/service.yaml
                     '''
                 }
             }
