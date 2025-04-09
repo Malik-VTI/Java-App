@@ -1,5 +1,13 @@
 pipeline {
     agent any
+
+    environment {
+        REGISTRY = "docker.io/malikvti"
+        IMAGE_NAME = "retail-service"
+        IMAGE_TAG = "1.0"
+        KUBECONFIG_CREDENTIAL = 'kubeconfig' // ID credential di Jenkins
+        DOCKERHUB_CREDENTIAL = 'dockerhub-credential' // ID credential DockerHub
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -19,21 +27,28 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        stage('Package') {
+        stage('Build Image') {
             steps {
-                // Pindahkan hasil build ke direktori aplikasi
-                sh '''
-                    sudo mkdir -p /opt/product-management
-                    sudo cp target/ecommerce-app-0.0.1-SNAPSHOT.jar /opt/product-management/
-                '''
+                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIAL}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    // Login ke DockerHub
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+                        docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+                    '''
+                }
             }
         }
-        stage('Restart Application') {
+        stage('Deploy to Kubernetes') {
             steps {
-                // Restart aplikasi menggunakan systemctl
-                sh '''
-                    echo "P@ssw0rd" | sudo -S systemctl restart product-management.service
-                '''
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh '''
+                        kubectl apply -f k8s/configmap.yaml
+                        kubectl apply -f k8s/secret.yaml
+                        kubectl apply -f k8s/deployment.yaml
+                        kubectl apply -f k8s/service.yaml
+                    '''
+                }
             }
         }
     }

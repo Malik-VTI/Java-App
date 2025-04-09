@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    tags.datadoghq.com/env: production
+    tags.datadoghq.com/service: retail-service
+    tags.datadoghq.com/version: 1.0
+spec:
+  template:
+    metadata:
+      labels:
+        tags.datadoghq.com/env: production
+        tags.datadoghq.com/service: retail-service
+        tags.datadoghq.com/version: 1.0
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        admission.datadoghq.com/java-lib.version: v1.47.3
+    spec:
+      containers:
+        - name: retail-service
+          image: docker.io/retail-service:latest
+          env:
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_APPSEC_ENABLED
+              value: "true"
+            - name: DD_IAST_ENABLED
+              value: "true"
+            - name: DD_APPSEC_SCA_ENABLED
+              value: "true"
+            - name: DD_SERVICE_MAPPING
+              value: "sqlserver:retail-db"
+            - name: DD_SERVICE
+              value: "retail-service"
