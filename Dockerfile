@@ -1,11 +1,11 @@
-FROM ubuntu:22.04
+FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
 # Copy binary dari hasil orchestrion build di Jenkins
-COPY target/retail-service-1.0.jar .
+COPY target/retail-service-1.0.jar app.jar
 
 # Expose port kalau perlu
 EXPOSE 7070
 
-CMD ["./retail-service-1.0.jar"]
+CMD ["java", "-jar", "app.jar"]
