@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: retail-service
+  namespace: default
   labels:
     tags.datadoghq.com/env: production
     tags.datadoghq.com/service: retail-service
