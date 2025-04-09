@@ -23,9 +23,11 @@ spec:
       annotations:
         admission.datadoghq.com/java-lib.version: v1.47.3
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: retail-service
-          image: docker.io/malikvti/retail-service:latest
+          image: docker.io/malikvti/retail-service:1.0
           env:
             - name: DD_PROFILING_ENABLED
               value: "true"
