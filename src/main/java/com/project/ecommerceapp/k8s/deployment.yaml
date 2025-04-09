@@ -8,6 +8,9 @@ metadata:
     tags.datadoghq.com/service: retail-service
     tags.datadoghq.com/version: "1.0"
 spec:
+  selector:
+    matchLabels:
+      app: retail-service
   template:
     metadata:
       labels:
