@@ -11,6 +11,7 @@ spec:
   template:
     metadata:
       labels:
+        app: retail-service
         tags.datadoghq.com/env: production
         tags.datadoghq.com/service: retail-service
         tags.datadoghq.com/version: "1.0"
