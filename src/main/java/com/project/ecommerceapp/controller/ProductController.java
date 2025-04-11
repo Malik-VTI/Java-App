@@ -16,7 +16,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class ProductController {
     private static final Logger logger = Logger.getLogger(ProductController.class);
 
     @GetMapping("/")
-    @Cacheable(value = "product", keyGenerator = "customKeyGenerator")
+    @Cacheable(value = "product")
     public ResponseEntity<ApiResponse> getProducts(){
         try {
             ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
