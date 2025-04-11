@@ -29,6 +29,15 @@ spec:
         - name: retail-service
           image: docker.io/malikvti/retail-service:1.0
           env:
+            - name: SPRING_REDIS_HOST
+              value: "http://redis-16016.c74.us-east-1-4.ec2.redns.redis-cloud.com"
+            - name: SPRING_REDIS_PORT
+              value: "16016"
+            - name: SPRING_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: redis-password
             - name: DD_PROFILING_ENABLED
               value: "true"
             - name: DD_LOGS_INJECTION

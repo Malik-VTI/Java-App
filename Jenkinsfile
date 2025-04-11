@@ -45,6 +45,7 @@ pipeline {
                     sh '''
                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/configmap.yaml
                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/secret.yaml
+                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/redis-secret.yaml
                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/deployment.yaml
                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/service.yaml
                     '''

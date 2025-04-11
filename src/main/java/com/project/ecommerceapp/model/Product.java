@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
+@Cacheable
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -13,6 +13,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +27,7 @@ import java.util.Optional;
     Using ProductRepository class to interact with database and using CategoryRepository class for retrieve the category information.
 */
 @Service
+@CacheConfig(cacheNames = "product")
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
@@ -35,6 +40,7 @@ public class ProductServiceImpl implements ProductService{
         - Return new product / save new product.
     */
     @Override
+    @CachePut(key = "#result.id")
     public Product addProduct(AddProductRequest request) {
         // check the category in the database
         // set the product if found the category
@@ -67,6 +73,7 @@ public class ProductServiceImpl implements ProductService{
         - Return product with the id from the request and will throw exception message if the product id not found.
     */
     @Override
+    @Cacheable(key = "#id")
     public Product getProductById(Long id) {
         logger.info("Fetching product by id: " + id);
         return productRepository.findById(id)
@@ -82,6 +89,7 @@ public class ProductServiceImpl implements ProductService{
         - Throw exception message if the product with selected id not found.
     */
     @Override
+    @CacheEvict(key = "#id")
     public void deleteProductById(Long id) {
         logger.info("Delete product by id: " + id);
         productRepository.findById(id)
@@ -101,6 +109,7 @@ public class ProductServiceImpl implements ProductService{
         - Throw exception message if product with id selected not found.
     */
     @Override
+    @CachePut(key = "#productId")
     public Product updateProduct(UpdateProductRequest request, Long productId) {
         logger.info("Update product with id: " + productId);
         return productRepository.findById(productId)
@@ -142,6 +151,7 @@ public class ProductServiceImpl implements ProductService{
         - Return list of products.
     */
     @Override
+    @Cacheable(cacheNames = "allProducts")
     public List<Product> getAllProduct() {
         logger.info("Fetching all products");
         return productRepository.findAll();
@@ -153,6 +163,7 @@ public class ProductServiceImpl implements ProductService{
         - Returns list of products with that category.
     */
     @Override
+    @Cacheable(cacheNames = "productsByCategory", key = "#category")
     public List<Product> getProductsByCategory(String category) {
         logger.info("Fetching products by category: " + category);
         return productRepository.findByCategoryName(category);
