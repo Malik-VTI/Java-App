@@ -4,7 +4,7 @@ metadata:
   name: retail-service
   namespace: default
 spec:
-  type: NodePort
+  type: ClusterIp
   selector:
     app: retail-service
   ports:
