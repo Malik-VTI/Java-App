@@ -39,11 +39,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: retail-service-ingress
-#  annotations:
-#    nginx.ingress.kubernetes.io/rewrite-target: /
-  labels:
-    name: retail-service-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx  # <-- Tambahkan ini
   rules:
     - http:
         paths:
