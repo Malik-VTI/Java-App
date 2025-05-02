@@ -1,22 +1,22 @@
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: retail-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: retail-service
-  template:
-    metadata:
-      labels:
-        app: retail-service
-    spec:
-      containers:
-        - name: retail-service
-          image: docker.io/malikvti/retail-service:1.0
-          ports:
-            - containerPort: 7070
+#apiVersion: apps/v1
+#kind: ReplicaSet
+#metadata:
+#  name: retail-service
+#spec:
+#  replicas: 3
+#  selector:
+#    matchLabels:
+#      app: retail-service
+#  template:
+#    metadata:
+#      labels:
+#        app: retail-service
+#    spec:
+#      containers:
+#        - name: retail-service
+#          image: docker.io/malikvti/retail-service:1.0
+#          ports:
+#            - containerPort: 7070
 
 ---
 

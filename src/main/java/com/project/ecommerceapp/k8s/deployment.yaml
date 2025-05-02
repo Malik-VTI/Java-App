@@ -8,7 +8,7 @@ metadata:
     tags.datadoghq.com/service: retail-service
     tags.datadoghq.com/version: "1.0"
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: retail-service
