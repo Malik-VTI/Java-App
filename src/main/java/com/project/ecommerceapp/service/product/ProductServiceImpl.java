@@ -10,6 +10,9 @@ import com.project.ecommerceapp.request.AddProductRequest;
 import com.project.ecommerceapp.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +34,10 @@ public class ProductServiceImpl implements ProductService{
         - request : Object from AddProductRequest who contain the product details who will use.
         - Return new product / save new product.
     */
+//    @Caching(evict = {
+//            @CacheEvict(value = "allProducts", allEntries = true),
+//            @CacheEvict(value = "productById", key = "#result.id", condition = "#result != null")
+//    })
     @Override
     public Product addProduct(AddProductRequest request) {
         // check the category in the database
@@ -63,6 +70,7 @@ public class ProductServiceImpl implements ProductService{
         - id : Param id from the product selected to retrieve.
         - Return product with the id from the request and will throw exception message if the product id not found.
     */
+//    @Cacheable(value = "productById", key = "#id")
     @Override
     public Product getProductById(Long id) {
         logger.info("Fetching product by id: " + id);
@@ -78,6 +86,10 @@ public class ProductServiceImpl implements ProductService{
         - id : Param id from product selected.
         - Throw exception message if the product with selected id not found.
     */
+//    @Caching(evict = {
+//            @CacheEvict(value = "allProducts", allEntries = true),
+//            @CacheEvict(value = "productById", key = "#result.id", condition = "#result != null")
+//    })
     @Override
     public void deleteProductById(Long id) {
         logger.info("Delete product by id: " + id);
@@ -97,6 +109,10 @@ public class ProductServiceImpl implements ProductService{
         - productId : Param from product id selected for update.
         - Throw exception message if product with id selected not found.
     */
+//    @Caching(evict = {
+//            @CacheEvict(value = "allProducts", allEntries = true),
+//            @CacheEvict(value = "productById", key = "#result.id", condition = "#result != null")
+//    })
     @Override
     public Product updateProduct(UpdateProductRequest request, Long productId) {
         logger.info("Update product with id: " + productId);
@@ -138,6 +154,7 @@ public class ProductServiceImpl implements ProductService{
         - Retrieves all products.
         - Return list of products.
     */
+//    @Cacheable(value = "allProducts")
     @Override
     public List<Product> getAllProduct() {
         logger.info("Fetching all products");

@@ -24,14 +24,12 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RequiredArgsConstructor
 @RestController
-@CacheConfig(cacheNames = "product")
 @RequestMapping("${api.prefix}/product")
 public class ProductController {
     private final ProductService productService;
     private static final Logger logger = Logger.getLogger(ProductController.class);
 
     @GetMapping("/")
-    @Cacheable(value = "product")
     public ResponseEntity<ApiResponse> getProducts(){
         try {
             ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
@@ -66,7 +64,6 @@ public class ProductController {
     }
 
     @GetMapping("/id/{productId}")
-    @Cacheable(value = "product", key = "#productId")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
         try {
             ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
@@ -107,7 +104,6 @@ public class ProductController {
     }
 
     @PutMapping("/id/{productId}/update")
-    @CachePut(cacheNames = "product", key = "#productId")
     public ResponseEntity<ApiResponse> updateProduct(@RequestBody AddProductRequest request, @PathVariable Long productId){
         logger.info("Updating product by id: " + productId);
         try {
@@ -121,7 +117,6 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
-    @CacheEvict(cacheNames = "product", key = "#productId", beforeInvocation = true)
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long productId){
         logger.info("Delete product by id: " + productId);
         try {
