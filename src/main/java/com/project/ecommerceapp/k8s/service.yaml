@@ -39,15 +39,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: retail-service-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2  # Rewrite path
-    nginx.ingress.kubernetes.io/use-regex: "true"
+#  annotations:
+#    nginx.ingress.kubernetes.io/rewrite-target: /$2  # Rewrite path
+#    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /api/v1(/|$)(.*)  # Tangkap semua path setelah /api/v1
+          - path: /api/v1 # Tangkap semua path setelah /api/v1
             pathType: Prefix
             backend:
               service:
