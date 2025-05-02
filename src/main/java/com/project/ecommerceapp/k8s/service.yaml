@@ -6,12 +6,11 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      name: retail-service
+      app: retail-service
   template:
     metadata:
-      name: retail-service
       labels:
-        name: retail-service
+        app: retail-service
     spec:
       containers:
         - name: retail-service
@@ -48,6 +47,9 @@ spec:
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: retail-service
-              servicePort: 7070
+              service:
+                name: retail-service
+                port:
+                  number: 7070
