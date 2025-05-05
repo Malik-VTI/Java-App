@@ -4,6 +4,6 @@ metadata:
   name: sqlserver-config
   namespace: default
 data:
-  SQLSERVER_HOST: "10.30.100.82"
+  SQLSERVER_HOST: "10.100.33.89"
   SQLSERVER_PORT: "1433"
-  SQLSERVER_DB: "dbcollect_datadog"
+  SQLSERVER_DB: "retail-service-staging"
