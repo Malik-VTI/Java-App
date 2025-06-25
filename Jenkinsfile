@@ -27,30 +27,40 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        stage('Build Image') {
+
+        stage('Package') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIAL}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    // Login ke DockerHub
-                    sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
-                        docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-                    '''
-                }
+                // Pindahkan hasil build ke direktori aplikasiMore actions
+                sh '''
+                    mkdir -p /opt/sample-application
+                    cp target/retail-service-1.0.jar /opt/sample-application/
+                '''
             }
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    sh '''
-                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/configmap.yaml
-                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/secret.yaml
-                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/redis-secret.yaml
-                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/deployment.yaml
-                        kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/service.yaml
-                    '''
-                }
-            }
-        }
+//         stage('Build Image') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIAL}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+//                     // Login ke DockerHub
+//                     sh '''
+//                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+//                         docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+//                         docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+//                     '''
+//                 }
+//             }
+//         }
+//         stage('Deploy to Kubernetes') {
+//             steps {
+//                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+//                     sh '''
+//                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/configmap.yaml
+//                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/secret.yaml
+//                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/redis-secret.yaml
+//                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/deployment.yaml
+//                         kubectl apply -f src/main/java/com/project/ecommerceapp/k8s/service.yaml
+//                     '''
+//                 }
+//             }
+//         }
     }
 }
