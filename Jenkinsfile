@@ -18,13 +18,13 @@ pipeline {
         stage('Build') {
             steps {
                 // Build aplikasi (contoh menggunakan Maven)
-                sh 'mvn clean install'
+                sh '/opt/apache-maven-3.9.10/bin/mvn clean install'
             }
         }
         stage('Test') {
             steps {
                 // Jalankan unit test
-                sh 'mvn test'
+                sh '/opt/apache-maven-3.9.10/bin/mvn test'
             }
         }
 
