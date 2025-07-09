@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.project</groupId>
 	<artifactId>retail-service</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 	<name>ecommerce-app</name>
 	<description>A simple backend app for e-commerce</description>
 	<url/>
