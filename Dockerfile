@@ -3,7 +3,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copy binary dari hasil orchestrion build di Jenkins
-COPY target/retail-service-1.2.jar app.jar
+COPY target/retail-service-1.3.jar app.jar
 
 # Expose port kalau perlu
 EXPOSE 7070

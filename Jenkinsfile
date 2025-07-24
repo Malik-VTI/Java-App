@@ -4,7 +4,7 @@ pipeline {
     environment {
         REGISTRY = "docker.io/malikvti"
         IMAGE_NAME = "retail-service"
-        IMAGE_TAG = "2.0"
+        IMAGE_TAG = "2.1"
         KUBECONFIG_CREDENTIAL = 'kubeconfig' // ID credential di Jenkins
         DOCKERHUB_CREDENTIAL = 'dockerhub-credential' // ID credential DockerHub
     }
@@ -33,7 +33,7 @@ pipeline {
                 // Pindahkan hasil build ke direktori aplikasiMore actions
                 sh '''
                     mkdir -p /opt/sample-application
-                    cp target/retail-service-1.2.jar /opt/sample-application/
+                    cp target/retail-service-1.3.jar /opt/sample-application/
                 '''
             }
         }
