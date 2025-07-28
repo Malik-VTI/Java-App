@@ -132,23 +132,38 @@ public class ProductServiceImpl implements ProductService{
                     return new ResourceException("Product Not Found");
                 });
     }
-    private Product updateExistingProduct(Product product, UpdateProductRequest request){
-        logger.info("Updating product details for id: " + product.getId());
-        product.setName(request.getName());
-        product.setBrand(request.getBrand());
-        product.setPrice(request.getPrice());
-        product.setInventory(request.getInventory());
-        product.setDescription(request.getDescription());
 
-        logger.info("Fetching category: " + request.getCategory().getName());
-        Category category = categoryRepository.findByName(request.getCategory().getName());
-        if (category == null) {
-            logger.error("Category not found: " + request.getCategory().getName());
-            throw new ResourceException("Category not found");
+    private Product updateExistingProduct(Product product, UpdateProductRequest request) {
+        logger.info("Updating product details for id: " + product.getId());
+
+        if (request.getName() != null) {
+            product.setName(request.getName());
         }
-        product.setCategory(category);
+        if (request.getBrand() != null) {
+            product.setBrand(request.getBrand());
+        }
+        if (request.getPrice() != null) {
+            product.setPrice(request.getPrice());
+        }
+        if (request.getInventory() != null) {
+            product.setInventory(request.getInventory());
+        }
+        if (request.getDescription() != null) {
+            product.setDescription(request.getDescription());
+        }
+        if (request.getCategory() != null && request.getCategory().getName() != null) {
+            logger.info("Fetching category: " + request.getCategory().getName());
+            Category category = categoryRepository.findByName(request.getCategory().getName());
+            if (category == null) {
+                logger.error("Category not found: " + request.getCategory().getName());
+                throw new ResourceException("Category not found");
+            }
+            product.setCategory(category);
+        }
+
         return product;
     }
+
 
     /*
         - Retrieves all products.

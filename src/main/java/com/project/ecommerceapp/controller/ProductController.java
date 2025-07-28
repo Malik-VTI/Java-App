@@ -63,7 +63,7 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/id/{productId}/update")
+    @PatchMapping("/id/{productId}/update")
     public ResponseEntity<ApiResponse> updateProduct(@RequestBody UpdateProductRequest request, @PathVariable Long productId){
         logger.info("Updating product by id: " + productId);
         try {
