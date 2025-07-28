@@ -1,11 +1,20 @@
 <configuration>
+  <!-- FILE appender using LogstashEncoder with MDC fields -->
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>/opt/sample-application/app.log</file>
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <customFields>{"application":"sample-application"}</customFields>
+      <includeMdcKeyName>trace_id</includeMdcKeyName>
+      <includeMdcKeyName>span_id</includeMdcKeyName>
+    </encoder>
   </appender>
 
+  <!-- CONSOLE appender with JSON format that includes MDC fields -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <includeMdcKeyName>trace_id</includeMdcKeyName>
+      <includeMdcKeyName>span_id</includeMdcKeyName>
+    </encoder>
   </appender>
 
   <root level="INFO">
