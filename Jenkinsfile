@@ -33,7 +33,7 @@ pipeline {
                 // Pindahkan hasil build ke direktori aplikasiMore actions
                 sh '''
                     mkdir -p /opt/sample-application
-                    cp target/retail-service-1.4.jar /opt/sample-application/
+                    cp target/retail-service-1.5.jar /opt/sample-application/
                 '''
             }
         }
