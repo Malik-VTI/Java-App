@@ -4,16 +4,11 @@ import com.project.ecommerceapp.dto.ProductDto;
 import com.project.ecommerceapp.exceptions.ResourceException;
 import com.project.ecommerceapp.model.Product;
 import com.project.ecommerceapp.request.AddProductRequest;
+import com.project.ecommerceapp.request.UpdateProductRequest;
 import com.project.ecommerceapp.response.ApiResponse;
 import com.project.ecommerceapp.service.product.ProductService;
-import datadog.trace.api.CorrelationIdentifier;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
-import org.apache.logging.log4j.ThreadContext;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
@@ -31,61 +26,26 @@ public class ProductController {
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse> getProducts(){
-        try {
-            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-            logger.info("Fetching all products");
-        } finally {
-            ThreadContext.remove("dd.trace_id");
-            ThreadContext.remove("dd.span_id");
-        }
-        List<Product>products = productService.getAllProduct();
+        logger.info("Fetching all products");
+        List<Product> products = productService.getAllProduct();
         List<ProductDto> dataProduct = productService.getListProductDto(products);
         if (products.isEmpty()) {
-            try {
-                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-                logger.info("No products available");
-            } finally {
-                ThreadContext.remove("dd.trace_id");
-                ThreadContext.remove("dd.span_id");
-            }
+            logger.info("No products available");
             return ResponseEntity.ok(new ApiResponse("No products available", Collections.emptyList()));
         }
-        try {
-            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-            logger.info("Getting all products");
-        } finally {
-            ThreadContext.remove("dd.trace_id");
-            ThreadContext.remove("dd.span_id");
-        }
+        logger.info("Getting all products");
         return ResponseEntity.ok(new ApiResponse("Product:", dataProduct));
     }
 
     @GetMapping("/id/{productId}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable Long productId){
-        try {
-            ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-            ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-            logger.info("Fetching product by id: " + productId);
-        } finally {
-            ThreadContext.remove("dd.trace_id");
-            ThreadContext.remove("dd.span_id");
-        }
+        logger.info("Fetching product by id: " + productId);
         try {
             Product product = productService.getProductById(productId);
             ProductDto productDto = productService.getProductDto(product);
             return ResponseEntity.ok(new ApiResponse("Product: ", productDto));
         } catch (ResourceException e) {
-            try {
-                ThreadContext.put("dd.trace_id", CorrelationIdentifier.getTraceId());
-                ThreadContext.put("dd.span_id", CorrelationIdentifier.getSpanId());
-                logger.error("Product not found with id: " + productId, e);
-            } finally {
-                ThreadContext.remove("dd.trace_id");
-                ThreadContext.remove("dd.span_id");
-            }
+            logger.error("Product not found with id: " + productId, e);
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Error:", e.getMessage()));
         }
     }
@@ -104,11 +64,11 @@ public class ProductController {
     }
 
     @PutMapping("/id/{productId}/update")
-    public ResponseEntity<ApiResponse> updateProduct(@RequestBody AddProductRequest request, @PathVariable Long productId){
+    public ResponseEntity<ApiResponse> updateProduct(@RequestBody UpdateProductRequest request, @PathVariable Long productId){
         logger.info("Updating product by id: " + productId);
         try {
-            Product product = productService.getProductById(productId);
-            ProductDto productDto = productService.getProductDto(product);
+            Product updatedProduct = productService.updateProduct(request, productId);
+            ProductDto productDto = productService.getProductDto(updatedProduct);
             return ResponseEntity.ok(new ApiResponse("Product updated", productDto));
         } catch (ResourceException e){
             logger.error("Failed to update product with id: " + productId, e);
@@ -147,7 +107,7 @@ public class ProductController {
 
     @GetMapping("/category-and-brand")
     public ResponseEntity<ApiResponse> getProductsByCategoryAndBrand(@RequestParam String category, @RequestParam String brandName){
-        logger.info("Get product by category dan brand name");
+        logger.info("Get product by category and brand name");
         try {
             List<Product> products = productService.getProductsByCategoryAndBrand(category, brandName);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
@@ -156,6 +116,7 @@ public class ProductController {
             }
             return ResponseEntity.ok(new ApiResponse("Data:", dataProduct));
         } catch (Exception e){
+            logger.error("Failed to fetch products by category and brand", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
@@ -167,10 +128,12 @@ public class ProductController {
             List<Product> products = productService.getProductsByName(name);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
             if (products.isEmpty()){
+                logger.info("Products with name " + name + " not found");
                 return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products with name " + name + " not found", null));
             }
             return ResponseEntity.ok(new ApiResponse("Data:", dataProduct));
         } catch (Exception e){
+            logger.error("Failed to fetch products by name", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
@@ -182,10 +145,12 @@ public class ProductController {
             List<Product> products = productService.getProductsByBrand(brand);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
             if (products.isEmpty()){
+                logger.info("Products with brand " + brand + " not found");
                 return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products with brand " + brand + " not found", null));
             }
             return ResponseEntity.ok(new ApiResponse("Data:", dataProduct));
         } catch (Exception e) {
+            logger.error("Failed to fetch products by brand", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
@@ -197,20 +162,24 @@ public class ProductController {
             List<Product> products = productService.getProductsByCategory(category);
             List<ProductDto> dataProduct = productService.getListProductDto(products);
             if (products.isEmpty()){
+                logger.info("Products with category " + category + " not found");
                 return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products with category " + category + " not found", null));
             }
             return ResponseEntity.ok(new ApiResponse("Data:", dataProduct));
         } catch (Exception e) {
+            logger.error("Failed to fetch products by category", e);
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
     @GetMapping("/count")
     public ResponseEntity<ApiResponse> countProductsByBrandAndName(@RequestParam String brand, @RequestParam String name){
+        logger.info("Counting products by brand: " + brand + " and name: " + name);
         try {
             var productCount = productService.countProductsByBrandAndName(brand, name);
             return ResponseEntity.ok(new ApiResponse("Total products:", productCount));
         } catch (Exception e) {
+            logger.error("Failed to count products by brand and name", e);
             return ResponseEntity.ok(new ApiResponse(e.getMessage(), null));
         }
     }

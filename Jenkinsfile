@@ -33,22 +33,22 @@ pipeline {
                 // Pindahkan hasil build ke direktori aplikasiMore actions
                 sh '''
                     mkdir -p /opt/sample-application
-                    cp target/retail-service-1.3.jar /opt/sample-application/
+                    cp target/retail-service-1.4.jar /opt/sample-application/
                 '''
             }
         }
-        stage('Build Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIAL}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    // Login ke DockerHub
-                    sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
-                        docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-                    '''
-                }
-            }
-        }
+//         stage('Build Image') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIAL}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+//                     // Login ke DockerHub
+//                     sh '''
+//                         echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+//                         docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+//                         docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+//                     '''
+//                 }
+//             }
+//         }
 //         stage('Deploy to Kubernetes') {
 //             steps {
 //                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
